@@ -5,9 +5,23 @@ from urllib.parse import urlparse, urljoin
 import re
 from io import StringIO
 
+def normalize_url(url):
+    """
+    Normalize a URL by removing 'www.' if present.
+    """
+    if url.startswith("www."):
+        return url[4:]
+    return url
+
 def is_valid_url(url, domain):
+    """
+    Check if a URL is valid and belongs to the specified domain, 
+    normalizing both the URL and the domain to handle 'www.' consistently.
+    """
     parsed_url = urlparse(url)
-    return bool(parsed_url.netloc) and domain in url
+    normalized_url_domain = normalize_url(parsed_url.netloc)
+    normalized_domain = normalize_url(domain)
+    return bool(parsed_url.netloc) and normalized_domain in normalized_url_domain
 
 def get_all_website_links(url, domain):
     urls = set()
@@ -53,6 +67,8 @@ user_input_url = st.text_input("Vul de website in om te scrapen", "")
 
 if user_input_url:
     domain = "{uri.scheme}://{uri.netloc}/".format(uri=urlparse(user_input_url))
+    # Normalize domain to handle 'www.' prefix uniformly
+    domain = normalize_url(domain)
     all_links, visited_urls = get_all_website_links(user_input_url, domain)
     
     scraped_data = StringIO()
