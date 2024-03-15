@@ -49,24 +49,24 @@ def scrape_text(url):
         return ""
 
 st.title("Website Scraper")
-user_input_url = st.text_input("Enter the website URL to scrape", "")
+user_input_url = st.text_input("Vul de website in om te scrapen", "")
 
 if user_input_url:
     domain = "{uri.scheme}://{uri.netloc}/".format(uri=urlparse(user_input_url))
     all_links, visited_urls = get_all_website_links(user_input_url, domain)
     
     scraped_data = StringIO()
-    scraped_data.write(f"Scraped content from: {user_input_url}\n\n")
+    scraped_data.write(f"Scraped inhoud van: {user_input_url}\n\n")
     
     for url in visited_urls:
-        st.write(f"Extracting text from: {url}")
+        st.write(f"Tekst extraheren van: {url}")
         text = scrape_text(url)
         scraped_data.write(f"URL: {url}\n{text}\n\n")
     
     scraped_data.seek(0)
     scraped_data_bytes = scraped_data.getvalue().encode('utf-8')
 
-    st.download_button(label="Download Scraped Content",
+    st.download_button(label="Download het tekst bestand",
                        data=scraped_data_bytes,
-                       file_name="scraped_site_content.txt",
+                       file_name="site.txt",
                        mime="text/plain")
