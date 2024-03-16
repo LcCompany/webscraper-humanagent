@@ -10,7 +10,7 @@ def ensure_scheme(url):
     Ensure the URL has a scheme; default to https if not.
     """
     if not urlparse(url).scheme:
-        url = "https://" + url
+        return "https://" + url
     return url
 
 def normalize_url(url):
@@ -30,7 +30,8 @@ def is_valid_url(url, domain):
     This function assumes both URL and domain are normalized.
     """
     parsed_url = urlparse(url)
-    return parsed_url.scheme in ('http', 'https') and domain in parsed_url.netloc
+    normalized_domain = normalize_url(domain)
+    return parsed_url.scheme in ('http', 'https') and normalized_domain in normalize_url(parsed_url.netloc)
 
 def get_all_website_links(url, domain):
     urls = set()
@@ -44,10 +45,12 @@ def get_all_website_links(url, domain):
         for a_tag in soup.findAll("a"):
             href = a_tag.attrs.get("href")
             if href == "" or href is None:
+                # Skip if href is empty or None
                 continue
             href = urljoin(url, href)
-            parsed_href = urlparse(href)
-            href = parsed_href.scheme + "://" + parsed_href.netloc + parsed_href.path
+            href = ensure_scheme(href)  # Make sure the scheme is present
+            if not href.endswith("/"):
+                href += "/"
             href = normalize_url(href)  # Normalize the URL before validation and addition
             if not is_valid_url(href, domain):
                 continue
@@ -74,13 +77,12 @@ def scrape_text(url):
 
 # Streamlit UI
 st.title("Website Scraper")
-user_input_url = st.text_input("Vul de website in om te scrapen", "")
+user_input_url = st.text_input("Enter the website to scrape", "")
 
 if user_input_url:
     user_input_url = normalize_url(user_input_url)  # Ensure the user input URL is normalized
-    domain = "{uri.scheme}://{uri.netloc}/".format(uri=urlparse(user_input_url))
-    # Further normalize domain if necessary
-    domain = normalize_url(domain)
+    domain = "{uri.scheme}://{uri.netloc}".format(uri=urlparse(user_input_url))
+    domain = normalize_url(domain)  # Further normalize domain if necessary
     all_links, visited_urls = get_all_website_links(user_input_url, domain)
     
     scraped_data = StringIO()
