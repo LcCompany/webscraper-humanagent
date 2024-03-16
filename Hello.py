@@ -44,13 +44,11 @@ def get_all_website_links(url, domain):
         soup = BeautifulSoup(response.text, "html.parser")
         for a_tag in soup.findAll("a"):
             href = a_tag.attrs.get("href")
-            if href == "" or href is None:
-                # Skip if href is empty or None
+            if href == "" or href is None or '#' in href or href.startswith('mailto:') or href.startswith('javascript:'):
+                # Skip if href is empty, None, an anchor, email link, or JavaScript action
                 continue
             href = urljoin(url, href)
             href = ensure_scheme(href)  # Make sure the scheme is present
-            if not href.endswith("/"):
-                href += "/"
             href = normalize_url(href)  # Normalize the URL before validation and addition
             if not is_valid_url(href, domain):
                 continue
@@ -98,5 +96,5 @@ if user_input_url:
 
     st.download_button(label="Download scraped text file",
                        data=scraped_data_bytes,
-                       file_name="scraped_site_content.txt",
+                       file_name="site.txt",
                        mime="text/plain")
