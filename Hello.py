@@ -75,7 +75,7 @@ def scrape_text(url):
 
 # Streamlit UI
 st.title("Website Scraper")
-user_input_url = st.text_input("Voer de website in die je wilt scrapen", "")
+user_input_url = st.text_input("Voer de website in die je wilt scrapen. Het script zal deze website vervolgens bezoeken en alle pagina's binnen hetzelfde domein scrapen om tekst te verzamelen.", "")
 
 if user_input_url:
     user_input_url = normalize_url(user_input_url)  # Ensure the user input URL is normalized
