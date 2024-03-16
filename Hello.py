@@ -107,5 +107,4 @@ if st.button("Start") and not st.session_state.running:
 if st.button("Stop"):
     st.session_state.running = False
 
-if 'scraped_data_bytes' in st.session_state and st.session_state.scraped_data_bytes:
-    st.download_button(label="Download het tekst bestand",
+if 'scraped_data_bytes' in st.session_state and st.session_state.scrap
